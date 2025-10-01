@@ -16,3 +16,13 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
   $routes->get('profile', 'UserController::profile');
   $routes->put('profile', 'UserController::updateProfile');
 });
+
+
+$routes->group('events', ['filter' => 'auth'], function($routes) {
+    $routes->get('', 'EventController::index');         // list all
+    $routes->post('', 'EventController::create');       // create event
+    $routes->get('(:num)', 'EventController::show/$1'); // get single
+    $routes->put('(:num)', 'EventController::update/$1'); // update
+    $routes->delete('(:num)', 'EventController::delete/$1'); // delete
+});
+
