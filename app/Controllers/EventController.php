@@ -24,14 +24,38 @@ class EventController extends ResourceController
         return $this->respond($event);
     }
 
+    // public function create()
+    // {
+    //     $data = $this->request->getJSON(true);
+    //     if (!$data || !isset($data['title'], $data['date'])) {
+    //         return $this->failValidationErrors("Title and date required");
+    //     }
+
+    //     $data['created_by'] = 1; // later replace with JWT user id
+    //     $this->model->insert($data);
+
+    //     return $this->respondCreated($data);
+    // }
+
     public function create()
     {
         $data = $this->request->getJSON(true);
         if (!$data || !isset($data['title'], $data['date'])) {
             return $this->failValidationErrors("Title and date required");
         }
+        // getting the authenticated user
+        $user = $this->currentUser();
+        if (!$user) {
+            return $this->failUnauthorized('Invalid or missing token');
+        }
 
-        $data['created_by'] = 1; // later replace with JWT user id
+        // here support both "id" and "sub" from JWT
+        $userId = $user['id'] ?? $user['sub'] ?? null;
+        if (!$userId) {
+            return $this->fail('Token missing user identifier');
+        }
+
+        $data['created_by'] = $userId;  // setting the user ID from JWT
         $this->model->insert($data);
 
         return $this->respondCreated($data);
